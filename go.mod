@@ -1,6 +1,6 @@
 module kasir-api
 
-go 1.25.6
+go 1.25.5
 
 require (
 	github.com/lib/pq v1.10.9
@@ -21,3 +21,7 @@ require (
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 )
+
+require github.com/lib/pq v1.10.9
+
+replace github.com/lib/pq => github.com/lib/pq v1.10.9
