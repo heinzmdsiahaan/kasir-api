@@ -57,19 +57,19 @@ func main() {
 
 	// Setup routes
 	http.HandleFunc("/api/produk", productHandler.HandleProducts)
-	http.HandleFunc("/api/produk/", apiKeyMiddleware(productHandler.HandleProductByID))
+	http.HandleFunc("/api/produk/", middlewares.CORS(middlewares.Logger(productHandler.HandleProductByID)))
 
 	http.HandleFunc("/api/product", productHandler.HandleProducts)
-	http.HandleFunc("/api/product/", apiKeyMiddleware(productHandler.HandleProductByID))
+	http.HandleFunc("/api/product/", middlewares.CORS(middlewares.Logger(productHandler.HandleProductByID)))
 
 	http.HandleFunc("/api/category", categoryHandler.HandleCategories)
-	http.HandleFunc("/api/category/", apiKeyMiddleware(categoryHandler.HandleCategoryByID))
+	http.HandleFunc("/api/category/", middlewares.CORS(middlewares.Logger(categoryHandler.HandleCategoryByID)))
 
 	transactionRepo := repositories.NewTransactionRepository(db)
 	transactionService := services.NewTransactionService(transactionRepo)
 	transactionHandler := handlers.NewTransactionHandler(transactionService)
 
-	http.HandleFunc("/api/checkout", apiKeyMiddleware(transactionHandler.Checkout))
+	http.HandleFunc("/api/checkout", middlewares.CORS(middlewares.Logger(transactionHandler.Checkout)))
 
 	reportRepo := repositories.NewReportRepository(db)
 	reportService := services.NewReportService(reportRepo)
