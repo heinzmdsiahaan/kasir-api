@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kasir-api/database"
 	"kasir-api/handlers"
+	"kasir-api/middlewares"
 	"kasir-api/repositories"
 	"kasir-api/services"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 type Config struct {
 	Port    string `mapstructure:"PORT"`
 	DB_CONN string `mapstructure:"DB_CONN"`
+	APIKey  string `mapstructure:"API_KEY"`
 }
 
 func main() {
@@ -31,6 +33,7 @@ func main() {
 	config := Config{
 		Port:    viper.GetString("PORT"),
 		DB_CONN: viper.GetString("DB_CONN"),
+		APIKey:  viper.GetString("API_KEY"),
 	}
 
 	// Setup Database
@@ -40,6 +43,8 @@ func main() {
 		return
 	}
 	defer db.Close()
+
+	apiKeyMiddleware := middlewares.APIKey(config.APIKey)
 
 	// Initialize Layers
 	productRepo := repositories.NewProductRepository(db)
@@ -52,16 +57,16 @@ func main() {
 
 	// Setup routes
 	http.HandleFunc("/api/produk", productHandler.HandleProducts)
-	http.HandleFunc("/api/produk/", productHandler.HandleProductByID)
+	http.HandleFunc("/api/produk/", apiKeyMiddleware(productHandler.HandleProductByID))
 
 	http.HandleFunc("/api/category", categoryHandler.HandleCategories)
-	http.HandleFunc("/api/category/", categoryHandler.HandleCategoryByID)
+	http.HandleFunc("/api/category/", apiKeyMiddleware(categoryHandler.HandleCategoryByID))
 
 	transactionRepo := repositories.NewTransactionRepository(db)
 	transactionService := services.NewTransactionService(transactionRepo)
 	transactionHandler := handlers.NewTransactionHandler(transactionService)
 
-	http.HandleFunc("/api/checkout", transactionHandler.Checkout)
+	http.HandleFunc("/api/checkout", apiKeyMiddleware(transactionHandler.Checkout))
 
 	reportRepo := repositories.NewReportRepository(db)
 	reportService := services.NewReportService(reportRepo)
