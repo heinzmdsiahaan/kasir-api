@@ -59,6 +59,9 @@ func main() {
 	http.HandleFunc("/api/produk", productHandler.HandleProducts)
 	http.HandleFunc("/api/produk/", apiKeyMiddleware(productHandler.HandleProductByID))
 
+	http.HandleFunc("/api/product", productHandler.HandleProducts)
+	http.HandleFunc("/api/product/", apiKeyMiddleware(productHandler.HandleProductByID))
+
 	http.HandleFunc("/api/category", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/category/", apiKeyMiddleware(categoryHandler.HandleCategoryByID))
 
